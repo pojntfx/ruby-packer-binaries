@@ -27,9 +27,7 @@ git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
 # Build upstream (see https://github.com/metanorma/ruby-packer/blob/master/bin/build-linux.sh)
 make
-export TEMP_DIR="$(mktemp -d .rubyc-build)"
-cp -r * $TEMP_DIR
-bin/rubyc --clean-tmpdir -r "$TEMP_DIR" -o rubyc "$TEMP_DIR/bin/rubyc"
+bin/rubyc -r . -o rubyc bin/rubyc
 strip rubyc
 
 # Copy binaries to staging directory
