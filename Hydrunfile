@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Install dependencies
+apt update
+apt install -y curl make git build-essential gnupg2 procps texinfo squashfs-tools libgdbm-dev libffi-dev libncurses-dev libssl-dev libreadline-dev libyaml-dev zlib1g-dev
+
+# Fix certificate authorities on armv7
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
+# Install and active the Ruby Version Manager
+gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+curl -sSL https://get.rvm.io | bash -s stable
+source /etc/profile.d/rvm.sh
+
+# Install Ruby version
+rvm install 2.7.1
+rvm use 2.7.1
+
+# Install Bundler
+gem install bundler --no-ri
+
+# Clone upstream
+rm -rf /data/upstream
+mkdir -p /data/upstream
+git clone https://github.com/saveriomiroddi/ruby-packer-dev.git /data/upstream
+
+# Checkout latest release
+cd /data/upstream
+git checkout sav/fix_rubygems_outdated_certificate
+
+# Build upstream
+bundle install
+bundle exec rake rubyc
+
+# Copy binaries to staging directory
+mkdir -p /data/staging
+cp rubyc /data/staging/rubyc-linux.$(uname -m)
