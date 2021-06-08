@@ -1,6 +1,6 @@
 # Ruby Packer Binaries
 
-Weekly builds for https://github.com/pmq20/ruby-packer.
+Weekly builds for https://github.com/metanorma/ruby-packer.
 
 ![hydrun CI](https://github.com/pojntfx/ruby-packer-binaries/workflows/hydrun%20CI/badge.svg)
 

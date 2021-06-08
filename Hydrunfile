@@ -2,7 +2,7 @@
 
 # Install dependencies
 apt update
-apt install -y curl make git build-essential gnupg2 procps texinfo squashfs-tools libgdbm-dev libffi-dev libncurses-dev libssl-dev libreadline-dev libyaml-dev zlib1g-dev
+apt install -y curl make git build-essential gnupg2 procps texinfo squashfs-tools squashfs-tools bison flex
 
 # Fix certificate authorities on armv7
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
@@ -13,24 +13,24 @@ curl -sSL https://get.rvm.io | bash -s stable
 source /etc/profile.d/rvm.sh
 
 # Install Ruby version
-rvm install 2.7.1
-rvm use 2.7.1
-
-# Install Bundler
-gem install bundler --no-ri
+rvm install 2.5.1
+rvm use 2.5.1
 
 # Clone upstream
 rm -rf /data/upstream
 mkdir -p /data/upstream
-git clone https://github.com/saveriomiroddi/ruby-packer-dev.git /data/upstream
+git clone https://github.com/metanorma/ruby-packer.git /data/upstream
 
 # Checkout latest release
 cd /data/upstream
-git checkout sav/fix_rubygems_outdated_certificate
+git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
-# Build upstream
-bundle install
-bundle exec rake rubyc
+# Build upstream (see https://github.com/metanorma/ruby-packer/blob/master/bin/build-linux.sh)
+make
+export TEMP_DIR="$(mktemp -d .rubyc-build)"
+cp -r * $TEMP_DIR
+bin/rubyc --clean-tmpdir -r "$TEMP_DIR" -o rubyc "$TEMP_DIR/bin/rubyc"
+strip rubyc
 
 # Copy binaries to staging directory
 mkdir -p /data/staging
