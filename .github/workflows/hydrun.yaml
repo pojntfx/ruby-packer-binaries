@@ -29,7 +29,7 @@ jobs:
           curl -L -o /tmp/hydrun https://github.com/pojntfx/hydrun/releases/download/latest/hydrun.linux-$(uname -m)
           sudo install /tmp/hydrun /usr/local/bin
       - name: Build with hydrun
-        run: hydrun -a amd64 ./Hydrunfile # TODO: Enable ARM64, armhf is not supported
+        run: hydrun -o ruby:2.5.1 -a amd64 ./Hydrunfile # TODO: Enable ARM64, armhf is not supported
       - name: Publish to GitHub releases
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: marvinpinto/action-automatic-releases@latest

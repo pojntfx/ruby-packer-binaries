@@ -2,19 +2,10 @@
 
 # Install dependencies
 apt update
-apt install -y curl make git build-essential gnupg2 procps texinfo squashfs-tools squashfs-tools bison flex
+apt install -y curl make git build-essential
 
 # Fix certificate authorities on armv7
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-
-# Install and active the Ruby Version Manager
-gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-curl -sSL https://get.rvm.io | bash -s stable
-source /etc/profile.d/rvm.sh
-
-# Install Ruby version
-rvm install 2.5.1
-rvm use 2.5.1
 
 # Clone upstream
 rm -rf /data/upstream
@@ -25,9 +16,13 @@ git clone https://github.com/metanorma/ruby-packer.git /data/upstream
 cd /data/upstream
 git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
 
-# Build upstream (see https://github.com/metanorma/ruby-packer/blob/master/bin/build-linux.sh)
+# Install dependencies
 make
-export TEMP_DIR="$(mktemp -d .rubyc-build.XXXXXX)"
+
+# Build upstream (see https://github.com/metanorma/ruby-packer/blob/master/bin/build-linux.sh)
+apt-get update -y && apt-get install -y squashfs-tools bison flex texinfo
+echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections
+export TEMP_DIR="$(mktemp -d /tmp/.rubyc-build.XXXXXX)"
 cp -r * $TEMP_DIR
 bin/rubyc --clean-tmpdir -r "$TEMP_DIR" -o rubyc "$TEMP_DIR/bin/rubyc"
 strip rubyc
